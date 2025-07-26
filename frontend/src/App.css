@@ -1,55 +1,58 @@
 .App {
+  text-align: center;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-main {
-  flex: 1;
-  padding: 2rem 0;
-}
-
-/* Header styles */
-.header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 3rem 0;
-  text-align: center;
-  margin-bottom: 2rem;
+  font-family: 'Garamond', 'Times New Roman', serif;
 }
 
-.header h1 {
-  font-size: 2.5rem;
+.App-header {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.App-header h1 {
+  font-size: 3rem;
   margin-bottom: 1rem;
   font-weight: 700;
 }
 
-.header p {
+.App-header p {
   font-size: 1.2rem;
+  margin-bottom: 2rem;
   opacity: 0.9;
+}
+
+.App-header h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #fbbf24;
+}
+
+.App-header h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.App-header > div {
   max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
 }
 
-/* Grid layout */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin: 2rem 0;
-}
-
-/* Responsive design */
 @media (max-width: 768px) {
-  .header h1 {
+  .App-header h1 {
     font-size: 2rem;
   }
   
-  .header p {
-    font-size: 1rem;
+  .App-header h2 {
+    font-size: 1.5rem;
   }
   
-  .grid {
-    grid-template-columns: 1fr;
+  .App-header p {
+    font-size: 1rem;
   }
 } 

@@ -1,147 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import axios from 'axios';
-import Navbar from './components/Navbar';
-import Home from './components/Home';
-import Login from './components/Login';
-import Register from './components/Register';
-import Dashboard from './components/Dashboard';
-import UserList from './components/UserList';
-import Statistics from './components/Statistics';
-import Players from './components/Players';
+import React from 'react';
 import './App.css';
 
-// Types
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  created_at: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  login: (token: string, user: User) => void;
-  logout: () => void;
-  isAuthenticated: boolean;
-}
-
-// Create Auth Context
-export const AuthContext = React.createContext<AuthContextType>({
-  user: null,
-  token: null,
-  login: () => {},
-  logout: () => {},
-  isAuthenticated: false,
-});
-
-// Protected Route Component
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = React.useContext(AuthContext);
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
-};
-
 function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true);
-
-  // Set up axios defaults
-  useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
-  }, [token]);
-
-  // Check if user is authenticated on app load
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (token) {
-        try {
-          const response = await axios.get('/api/profile');
-          setUser(response.data);
-        } catch (error) {
-          console.error('Authentication failed:', error);
-          localStorage.removeItem('token');
-          setToken(null);
-        }
-      }
-      setLoading(false);
-    };
-
-    checkAuth();
-  }, [token]);
-
-  const login = (newToken: string, userData: User) => {
-    setToken(newToken);
-    setUser(userData);
-    localStorage.setItem('token', newToken);
-  };
-
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
-  };
-
-  const authContextValue: AuthContextType = {
-    user,
-    token,
-    login,
-    logout,
-    isAuthenticated: !!token && !!user,
-  };
-
-  if (loading) {
-    return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        fontSize: '1.2rem'
-      }}>
-        Loading...
-      </div>
-    );
-  }
-
   return (
-    <AuthContext.Provider value={authContextValue}>
-      <Router>
-        <div className="App">
-          <Navbar />
-          <main className="container">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route 
-                path="/dashboard" 
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/users" 
-                element={
-                  <ProtectedRoute>
-                    <UserList />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route path="/statistics" element={<Statistics />} />
-              <Route path="/players" element={<Players />} />
-            </Routes>
-          </main>
+    <div className="App">
+      <header className="App-header">
+        <h1>🏆 Championship Tournament 2024</h1>
+        <p>Welcome to the premier competition platform!</p>
+        <div style={{ marginTop: '2rem' }}>
+          <h2>Live Updates</h2>
+          <div style={{ 
+            padding: '1rem', 
+            background: '#fef2f2', 
+            borderRadius: '0.375rem',
+            marginBottom: '1rem'
+          }}>
+            <h3 style={{ color: '#dc2626', margin: '0 0 0.5rem 0' }}>
+              Championship Final - Live
+            </h3>
+            <p style={{ margin: 0 }}>
+              Team Alpha vs Team Beta - Current Score: 2-1 (75th minute)
+            </p>
+          </div>
+          <div style={{ 
+            padding: '1rem', 
+            background: '#f0fdf4', 
+            borderRadius: '0.375rem'
+          }}>
+            <h3 style={{ color: '#16a34a', margin: '0 0 0.5rem 0' }}>
+              Quarter Finals Results
+            </h3>
+            <p style={{ margin: 0 }}>
+              Team Gamma advances to semi-finals after defeating Team Delta 3-0
+            </p>
+          </div>
         </div>
-      </Router>
-    </AuthContext.Provider>
+      </header>
+    </div>
   );
 }
 
