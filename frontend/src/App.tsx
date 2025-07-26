@@ -7,6 +7,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import UserList from './components/UserList';
+import Statistics from './components/Statistics';
+import Players from './components/Players';
 import './App.css';
 
 // Types
@@ -133,6 +135,8 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route path="/statistics" element={<Statistics />} />
+              <Route path="/players" element={<Players />} />
             </Routes>
           </main>
         </div>

@@ -32,6 +32,12 @@ const Navbar: React.FC = () => {
           <Link to="/" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
             Home
           </Link>
+          <Link to="/statistics" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+            Statistics
+          </Link>
+          <Link to="/players" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+            Players
+          </Link>
           
           {isAuthenticated ? (
             <>
