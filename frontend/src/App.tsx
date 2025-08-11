@@ -8,9 +8,9 @@ import Snapsvisor from './components/Snapsvisor';
 import Deltagare from './components/Deltagare';
 import Omröstning from './components/Omröstning';
 import Login from './components/Login';
-import Register from './components/Register';
+
 import UserProfile from './components/UserProfile';
-import { currentVersion, getLatestUpdates } from './utils/updates';
+
 
 interface User {
   id: number;
@@ -21,12 +21,8 @@ interface User {
   created_at: string;
 }
 
-// Footer component to show what's new
+// Simple Footer component
 const Footer: React.FC = () => {
-  const [showWhatsNew, setShowWhatsNew] = useState(false);
-
-  const whatsNewItems = getLatestUpdates(3);
-
   return (
     <footer style={{ 
       backgroundColor: '#f8f9fa', 
@@ -66,76 +62,10 @@ const Footer: React.FC = () => {
                   textDecoration: 'underline'
                 }}
               >
-                Bildarkiv
-              </button>
-            </li>
-            <li style={{ marginBottom: '0.5rem' }}>
-              <button 
-                onClick={() => window.scrollTo(0, 0)}
-                style={{ 
-                  background: 'none', 
-                  border: 'none', 
-                  color: '#666', 
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
-              >
-                Deltagare
-              </button>
-            </li>
-            <li style={{ marginBottom: '0.5rem' }}>
-              <button 
-                onClick={() => window.scrollTo(0, 0)}
-                style={{ 
-                  background: 'none', 
-                  border: 'none', 
-                  color: '#666', 
-                  fontSize: '0.9rem',
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
-              >
-                Omröstning
+                Tillbaka till toppen
               </button>
             </li>
           </ul>
-        </div>
-        
-        <div>
-          <h4 style={{ color: '#667eea', marginBottom: '1rem' }}>Vad är nytt</h4>
-          <button 
-            onClick={() => setShowWhatsNew(!showWhatsNew)}
-            style={{ 
-              background: 'none', 
-              border: '1px solid #667eea', 
-              color: '#667eea',
-              padding: '0.5rem 1rem',
-              borderRadius: '5px',
-              cursor: 'pointer',
-              fontSize: '0.9rem'
-            }}
-          >
-            {showWhatsNew ? 'Dölj' : 'Visa'} senaste uppdateringar
-          </button>
-          
-          {showWhatsNew && (
-            <div style={{ marginTop: '1rem' }}>
-              {whatsNewItems.map(item => (
-                <div key={item.id} style={{ marginBottom: '0.5rem' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#667eea', fontWeight: 'bold' }}>
-                    {new Date(item.date).toLocaleDateString('sv-SE')}
-                  </div>
-                  <div style={{ fontSize: '0.9rem', color: '#333', fontWeight: 'bold' }}>
-                    {item.title}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: '#666' }}>
-                    {item.description}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
       
@@ -148,9 +78,7 @@ const Footer: React.FC = () => {
         color: '#666'
       }}>
         <p style={{ margin: 0 }}>
-          © 2024 Skåre 2025. Alla rättigheter förbehållna. | 
-          Version {currentVersion.version} | 
-          Senast uppdaterad: {new Date(currentVersion.releaseDate).toLocaleDateString('sv-SE')}
+          © 2025 Skåre 2025. Alla rättigheter förbehållna.
         </p>
       </div>
     </footer>
