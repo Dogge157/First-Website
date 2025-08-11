@@ -126,8 +126,12 @@ function App() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     setCurrentUser(null);
+    setShowLogin(false);
+    setShowProfile(false);
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Clear any other auth-related data
+    localStorage.removeItem('isAuthenticated');
   };
 
   const renderSection = () => {

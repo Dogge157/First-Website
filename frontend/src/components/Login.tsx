@@ -61,6 +61,8 @@ const Login: React.FC<LoginProps> = ({ onPasswordVerified, onLogin, onClose, mod
     setLoading(true);
 
     try {
+      console.log('Attempting login with:', { username: formData.username, password: '***' });
+      
       const response = await fetch(buildApiUrl('/api/login'), {
         method: 'POST',
         headers: {
@@ -73,6 +75,7 @@ const Login: React.FC<LoginProps> = ({ onPasswordVerified, onLogin, onClose, mod
       });
 
       const data = await response.json();
+      console.log('Login response:', { status: response.status, data });
 
       if (response.ok) {
         if (onLogin) {
@@ -81,10 +84,13 @@ const Login: React.FC<LoginProps> = ({ onPasswordVerified, onLogin, onClose, mod
         if (onClose) {
           onClose();
         }
+        // Clear form data after successful login
+        setFormData({ username: '', password: '' });
       } else {
         setError(data.error || 'Inloggning misslyckades');
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('Ett fel uppstod. Kontrollera att servern är igång.');
     } finally {
       setLoading(false);
@@ -104,6 +110,9 @@ const Login: React.FC<LoginProps> = ({ onPasswordVerified, onLogin, onClose, mod
         <>
           <h1>Logga in</h1>
           <p>Logga in på ditt befintliga konto</p>
+          <p style={{ fontSize: '0.9rem', color: '#666', marginTop: '0.5rem' }}>
+            Använd ditt användarnamn och lösenord som du angav vid registrering
+          </p>
         </>
       )}
       
