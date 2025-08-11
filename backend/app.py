@@ -221,14 +221,18 @@ def update_user(user_id):
 @jwt_required()
 def delete_user(user_id):
     current_user_id = get_jwt_identity()
+    print(f"Delete user request - User ID: {user_id}, Current user ID: {current_user_id}")
     
     # Ensure user can only delete their own account
     if current_user_id != user_id:
+        print(f"Permission denied - User {current_user_id} trying to delete user {user_id}")
         return jsonify({'error': 'Du kan endast radera ditt eget konto'}), 403
     
     user = User.query.get_or_404(user_id)
+    print(f"Deleting user: {user.name} (ID: {user.id})")
     db.session.delete(user)
     db.session.commit()
+    print(f"User {user_id} deleted successfully")
     return jsonify({'message': 'Användare raderad'})
 
 @app.route('/api/login', methods=['POST'])

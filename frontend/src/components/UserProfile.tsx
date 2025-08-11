@@ -32,13 +32,19 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogout, onClose }) =>
 
     try {
       const token = localStorage.getItem('token');
+      console.log('Delete account - User ID:', user.id);
+      console.log('Delete account - Token:', token ? 'Present' : 'Missing');
+      
       const response = await fetch(`${buildApiUrl('/api/users')}/${user.id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
+      console.log('Delete response status:', response.status);
+      
       if (response.ok) {
         setSuccess('Ditt konto har raderats');
         setTimeout(() => {
@@ -47,9 +53,11 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogout, onClose }) =>
         }, 2000);
       } else {
         const data = await response.json();
+        console.log('Delete error response:', data);
         setError(data.error || 'Kunde inte radera kontot');
       }
     } catch (err) {
+      console.error('Delete account error:', err);
       setError('Ett fel uppstod vid radering av kontot');
     } finally {
       setLoading(false);
