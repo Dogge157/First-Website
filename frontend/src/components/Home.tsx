@@ -7,6 +7,7 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ onRegister }) => {
   const [showRegister, setShowRegister] = useState(false);
+
   return (
     <div className="section">
       <div className="hero-section">
@@ -106,7 +107,7 @@ const Home: React.FC<HomeProps> = ({ onRegister }) => {
             >
               ×
             </button>
-            <Register onLogin={onRegister} />
+            <Register onLogin={onRegister} onClose={() => setShowRegister(false)} />
           </div>
         </div>
       )}

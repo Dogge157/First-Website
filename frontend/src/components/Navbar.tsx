@@ -1,4 +1,5 @@
 import React from 'react';
+import { currentVersion } from '../utils/updates';
 
 interface User {
   id: number;
@@ -16,6 +17,8 @@ interface NavbarProps {
   isAuthenticated: boolean;
   currentUser: User | null;
   onLogout: () => void;
+  onShowLogin?: () => void;
+  onShowProfile?: () => void;
 }
 
 const Navbar: React.FC<NavbarProps> = ({
@@ -25,7 +28,9 @@ const Navbar: React.FC<NavbarProps> = ({
   setShowMenu,
   isAuthenticated,
   currentUser,
-  onLogout
+  onLogout,
+  onShowLogin,
+  onShowProfile
 }) => {
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -39,9 +44,21 @@ const Navbar: React.FC<NavbarProps> = ({
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <a href="#" className="logo" onClick={() => handleNavClick('home')}>
-          Skåre 2025
-        </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <a href="#" className="logo" onClick={() => handleNavClick('home')}>
+            Skåre 2025
+          </a>
+          <div style={{ 
+            fontSize: '0.7rem', 
+            color: '#6c757d',
+            display: 'flex',
+            flexDirection: 'column',
+            lineHeight: '1.2'
+          }}>
+            <span>v{currentVersion.version}</span>
+            <span>Uppdaterad: {new Date(currentVersion.releaseDate).toLocaleDateString('sv-SE')}</span>
+          </div>
+        </div>
         
         <button className="menu-toggle" onClick={toggleMenu}>
           ☰
@@ -104,14 +121,41 @@ const Navbar: React.FC<NavbarProps> = ({
           </li>
         </ul>
         
-        {isAuthenticated && currentUser && (
+        {isAuthenticated && currentUser ? (
           <div className="user-section">
             <div className="user-info">
               <span>{currentUser.name}</span>
               <span className="user-group">{currentUser.group}</span>
             </div>
-            <button className="logout-btn" onClick={onLogout}>
-              Logga ut
+            <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button 
+                className="btn"
+                onClick={onShowProfile}
+                style={{ 
+                  fontSize: '0.8rem', 
+                  padding: '0.25rem 0.5rem',
+                  backgroundColor: '#667eea'
+                }}
+              >
+                Min Profil
+              </button>
+              <button className="logout-btn" onClick={onLogout}>
+                Logga ut
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="user-section">
+            <button 
+              className="btn"
+              onClick={onShowLogin}
+              style={{ 
+                fontSize: '0.9rem', 
+                padding: '0.5rem 1rem',
+                backgroundColor: '#28a745'
+              }}
+            >
+              Logga in
             </button>
           </div>
         )}

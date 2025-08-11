@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 
 interface RegisterProps {
   onLogin: (user: any, token: string) => void;
+  onClose?: () => void; // Add optional close function
 }
 
-const Register: React.FC<RegisterProps> = ({ onLogin }) => {
+const Register: React.FC<RegisterProps> = ({ onLogin, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
     username: '',
-    email: '',
+    email: '', // Keep for optional use
     password: '',
     confirmPassword: '',
     group: ''
@@ -48,7 +49,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/users', {
+      const response = await fetch('http://localhost:5001/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin }) => {
         body: JSON.stringify({
           name: formData.name,
           username: formData.username,
-          email: formData.email,
+          email: formData.email || '', // Make email optional
           password: formData.password,
           group: formData.group
         }),
@@ -66,7 +67,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin }) => {
 
       if (response.ok) {
         // Auto-login after successful registration
-        const loginResponse = await fetch('http://localhost:5000/api/login', {
+        const loginResponse = await fetch('http://localhost:5001/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -80,6 +81,10 @@ const Register: React.FC<RegisterProps> = ({ onLogin }) => {
         if (loginResponse.ok) {
           const loginData = await loginResponse.json();
           onLogin(loginData.user, loginData.access_token);
+          // Close the modal if onClose function is provided
+          if (onClose) {
+            onClose();
+          }
         }
       } else {
         setError(data.error || 'Registrering misslyckades');
@@ -130,15 +135,14 @@ const Register: React.FC<RegisterProps> = ({ onLogin }) => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="email">E-post:</label>
+          <label htmlFor="email">E-post (valfritt):</label>
           <input
             type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
-            placeholder="din.email@example.com"
-            required
+            placeholder="din.email@example.com (valfritt)"
           />
         </div>
 
