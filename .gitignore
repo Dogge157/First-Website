@@ -51,11 +51,12 @@ yarn-debug.log*
 yarn-error.log*
 
 # React
-/frontend/build
-/frontend/.env.local
-/frontend/.env.development.local
-/frontend/.env.test.local
-/frontend/.env.production.local
+build/
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # IDE
 .vscode/
@@ -102,4 +103,15 @@ jspm_packages/
 *.tgz
 
 # Yarn Integrity file
-.yarn-integrity 
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Uploaded files (keep the directory structure but ignore actual files)
+backend/uploads/*/
+!backend/uploads/*/.gitkeep
+
+# Temporary files
+*.tmp
+*.temp 
