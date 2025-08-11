@@ -28,6 +28,6 @@
     }
   ],
   "env": {
-    "REACT_APP_API_URL": "https://your-backend-url.herokuapp.com"
+    "REACT_APP_API_URL": "https://your-railway-backend-url.railway.app"
   }
 } 
