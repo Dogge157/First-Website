@@ -44,6 +44,22 @@ CORS(app)
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
+# JWT error handlers
+@jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    print(f"JWT token expired: {jwt_payload}")
+    return jsonify({'error': 'Token har utgått'}), 401
+
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    print(f"Invalid JWT token: {error}")
+    return jsonify({'error': 'Ogiltig token'}), 401
+
+@jwt.unauthorized_loader
+def missing_token_callback(error):
+    print(f"Missing JWT token: {error}")
+    return jsonify({'error': 'Token saknas'}), 401
+
 # Database Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -220,20 +236,24 @@ def update_user(user_id):
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
-    current_user_id = get_jwt_identity()
-    print(f"Delete user request - User ID: {user_id}, Current user ID: {current_user_id}")
-    
-    # Ensure user can only delete their own account
-    if current_user_id != user_id:
-        print(f"Permission denied - User {current_user_id} trying to delete user {user_id}")
-        return jsonify({'error': 'Du kan endast radera ditt eget konto'}), 403
-    
-    user = User.query.get_or_404(user_id)
-    print(f"Deleting user: {user.name} (ID: {user.id})")
-    db.session.delete(user)
-    db.session.commit()
-    print(f"User {user_id} deleted successfully")
-    return jsonify({'message': 'Användare raderad'})
+    try:
+        current_user_id = get_jwt_identity()
+        print(f"Delete user request - User ID: {user_id}, Current user ID: {current_user_id}")
+        
+        # Ensure user can only delete their own account
+        if current_user_id != user_id:
+            print(f"Permission denied - User {current_user_id} trying to delete user {user_id}")
+            return jsonify({'error': 'Du kan endast radera ditt eget konto'}), 403
+        
+        user = User.query.get_or_404(user_id)
+        print(f"Deleting user: {user.name} (ID: {user.id})")
+        db.session.delete(user)
+        db.session.commit()
+        print(f"User {user_id} deleted successfully")
+        return jsonify({'message': 'Användare raderad'})
+    except Exception as e:
+        print(f"Error in delete_user: {str(e)}")
+        return jsonify({'error': f'Server error: {str(e)}'}), 500
 
 @app.route('/api/login', methods=['POST'])
 def login():
