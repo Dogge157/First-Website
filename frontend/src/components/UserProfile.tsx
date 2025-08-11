@@ -53,8 +53,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogout, onClose }) =>
           onClose();
         }, 2000);
       } else {
-        const data = await response.json();
-        console.log('Delete error response:', data);
+        console.log('Delete response status:', response.status);
+        console.log('Delete response headers:', response.headers);
+        
+        let data;
+        try {
+          data = await response.json();
+          console.log('Delete error response (JSON):', data);
+        } catch (jsonError) {
+          console.log('Delete error response (not JSON):', await response.text());
+          data = { error: 'Kunde inte läsa felmeddelande från servern' };
+        }
         
         // Check for specific JWT errors
         if (response.status === 401 || (data.msg && data.msg.includes('Subject must be a string'))) {

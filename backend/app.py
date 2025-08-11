@@ -280,10 +280,14 @@ def delete_user(user_id):
     try:
         current_user_id = get_jwt_identity()
         print(f"Delete user request - User ID: {user_id}, Current user ID: {current_user_id}")
+        print(f"Current user ID type: {type(current_user_id)}")
+        
+        # Convert current_user_id to int for comparison
+        current_user_id_int = int(current_user_id) if current_user_id else None
         
         # Ensure user can only delete their own account
-        if current_user_id != user_id:
-            print(f"Permission denied - User {current_user_id} trying to delete user {user_id}")
+        if current_user_id_int != user_id:
+            print(f"Permission denied - User {current_user_id_int} trying to delete user {user_id}")
             return jsonify({'error': 'Du kan endast radera ditt eget konto'}), 403
         
         user = User.query.get_or_404(user_id)
@@ -306,7 +310,9 @@ def login():
     user = User.query.filter_by(username=data['username']).first()
     
     if user and user.password_hash == data['password']:  # In real app, verify hashed password
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))  # Convert to string
+        print(f"Login successful for user {user.username} (ID: {user.id})")
+        print(f"Created token with identity: {str(user.id)}")
         return jsonify({
             'access_token': access_token,
             'user': user.to_dict()
