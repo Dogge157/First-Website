@@ -12,64 +12,41 @@ const Home: React.FC<HomeProps> = ({ onRegister }) => {
     <div className="section">
       <div className="hero-section">
         <h1>Skåre 2025</h1>
-        <p>Välkommen till den officiella webbplatsen för Skåre 2025!</p>
         
-        {/* Placeholder for the main image - replace src with actual image */}
+        {/* Main page image */}
         <img 
-          src="/placeholder-image.jpg" 
+          src="/Main_page.jpeg" 
           alt="Skåre 2025" 
           className="hero-image"
           style={{ 
-            maxWidth: '600px', 
+            maxWidth: '800px', 
+            width: '100%',
             height: 'auto',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            padding: '2rem',
-            borderRadius: '10px'
+            borderRadius: '10px',
+            marginTop: '2rem',
+            marginBottom: '2rem'
           }}
         />
         
-        <p style={{ marginTop: '2rem', fontSize: '1.1rem' }}>
-          Här hittar du allt du behöver veta om evenemanget, deltagare, tävlingar och mycket mer.
-        </p>
-      </div>
-      
-      <div className="grid grid-2">
-        <div className="card">
-          <h3>Bildarkiv</h3>
-          <p>Bläddra bland bilder från tidigare år, från 2022 och framåt. Reliviera minnen från tidigare evenemang.</p>
+        {/* Registration button */}
+        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+          <button 
+            className="btn" 
+            onClick={() => setShowRegister(true)}
+            style={{ 
+              fontSize: '1.2rem',
+              padding: '1rem 2rem',
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s'
+            }}
+          >
+            Registrera dig
+          </button>
         </div>
-        
-        <div className="card">
-          <h3>Tävlingar</h3>
-          <p>Information om kommande tävlingar och resultat från tidigare tävlingar kommer att publiceras här.</p>
-        </div>
-        
-        <div className="card">
-          <h3>Snapsvisor</h3>
-          <p>En samling av snapsvisor som kommer att läggas till här. Perfekt för att skapa stämning under evenemanget.</p>
-        </div>
-        
-        <div className="card">
-          <h3>Deltagare</h3>
-          <p>Se alla deltagare och deras tillhörighet till de tre grupperna: Manägers, Assar och Gollar.</p>
-        </div>
-      </div>
-      
-      <div className="card" style={{ marginTop: '2rem' }}>
-        <h3>Omröstning</h3>
-        <p>Delta i omröstningar och rösta på olika alternativ. Din röst är viktig för att forma evenemanget!</p>
-      </div>
-      
-      <div className="card" style={{ marginTop: '2rem', textAlign: 'center' }}>
-        <h3>Delta i Skåre 2025</h3>
-        <p>Registrera dig för att få full tillgång till alla funktioner och delta i omröstningar.</p>
-        <button 
-          className="btn" 
-          onClick={() => setShowRegister(true)}
-          style={{ marginTop: '1rem' }}
-        >
-          Registrera dig
-        </button>
       </div>
       
       {showRegister && (
