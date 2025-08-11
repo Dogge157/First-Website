@@ -1,5 +1,4 @@
 import React from 'react';
-import { currentVersion } from '../utils/updates';
 
 interface User {
   id: number;
@@ -48,16 +47,6 @@ const Navbar: React.FC<NavbarProps> = ({
           <a href="#" className="logo" onClick={() => handleNavClick('home')}>
             Skåre 2025
           </a>
-          <div style={{ 
-            fontSize: '0.7rem', 
-            color: '#6c757d',
-            display: 'flex',
-            flexDirection: 'column',
-            lineHeight: '1.2'
-          }}>
-            <span>v{currentVersion.version}</span>
-            <span>Uppdaterad: {new Date(currentVersion.releaseDate).toLocaleDateString('sv-SE')}</span>
-          </div>
         </div>
         
         <button className="menu-toggle" onClick={toggleMenu}>
