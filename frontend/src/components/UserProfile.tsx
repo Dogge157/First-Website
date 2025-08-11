@@ -54,7 +54,18 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogout, onClose }) =>
       } else {
         const data = await response.json();
         console.log('Delete error response:', data);
-        setError(data.error || 'Kunde inte radera kontot');
+        
+        // Check for specific JWT errors
+        if (response.status === 401) {
+          setError('Din session har utgått. Logga in igen för att radera ditt konto.');
+          // Automatically logout and close modal
+          setTimeout(() => {
+            onLogout();
+            onClose();
+          }, 3000);
+        } else {
+          setError(data.error || 'Kunde inte radera kontot');
+        }
       }
     } catch (err) {
       console.error('Delete account error:', err);
