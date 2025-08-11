@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { buildApiUrl } from '../config';
 
 interface LoginProps {
   onPasswordVerified?: (verified: boolean) => void;
@@ -28,7 +29,7 @@ const Login: React.FC<LoginProps> = ({ onPasswordVerified, onLogin, onClose, mod
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5001/api/verify-password', {
+      const response = await fetch(buildApiUrl('/api/verify-password'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ const Login: React.FC<LoginProps> = ({ onPasswordVerified, onLogin, onClose, mod
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5001/api/login', {
+      const response = await fetch(buildApiUrl('/api/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { buildApiUrl } from '../config';
 
 interface Participant {
   id: number;
@@ -21,7 +22,7 @@ const Deltagare: React.FC = () => {
   const fetchParticipants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/users', {
+      const response = await fetch(buildApiUrl('/api/users'), {
         headers: {
           'Authorization': `Bearer ${token}`
         }

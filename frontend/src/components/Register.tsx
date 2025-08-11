@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { buildApiUrl } from '../config';
 
 interface RegisterProps {
   onLogin: (user: any, token: string) => void;
@@ -49,7 +50,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin, onClose }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5001/api/users', {
+      const response = await fetch(buildApiUrl('/api/users'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ const Register: React.FC<RegisterProps> = ({ onLogin, onClose }) => {
 
       if (response.ok) {
         // Auto-login after successful registration
-        const loginResponse = await fetch('http://localhost:5001/api/login', {
+        const loginResponse = await fetch(buildApiUrl('/api/login'), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

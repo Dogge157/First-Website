@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { buildApiUrl } from '../config';
 
 interface Vote {
   id: number;
@@ -55,7 +56,7 @@ const Omröstning: React.FC = () => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/voting-questions');
+      const response = await fetch(buildApiUrl('/api/voting-questions'));
       if (response.ok) {
         const data = await response.json();
         setQuestions(data);
@@ -63,7 +64,7 @@ const Omröstning: React.FC = () => {
         // Fetch votes for each question
         const votesData = await Promise.all(
           data.map(async (question: VotingQuestion) => {
-            const votesResponse = await fetch(`http://localhost:5001/api/voting-questions/${question.id}/votes`);
+                         const votesResponse = await fetch(buildApiUrl(`/api/voting-questions/${question.id}/votes`));
             if (votesResponse.ok) {
               return await votesResponse.json();
             }
@@ -103,7 +104,7 @@ const Omröstning: React.FC = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('http://localhost:5001/api/voting-questions', {
+      const response = await fetch(buildApiUrl('/api/voting-questions'), {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -146,7 +147,7 @@ const Omröstning: React.FC = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('http://localhost:5001/api/votes', {
+      const response = await fetch(buildApiUrl('/api/votes'), {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -174,7 +175,7 @@ const Omröstning: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/voting-questions/${questionId}`, {
+      const response = await fetch(buildApiUrl(`/api/voting-questions/${questionId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

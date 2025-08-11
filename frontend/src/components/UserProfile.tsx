@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { buildApiUrl } from '../config';
 
 interface User {
   id: number;
@@ -31,7 +32,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogout, onClose }) =>
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/users/${user.id}`, {
+      const response = await fetch(`${buildApiUrl('/api/users')}/${user.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

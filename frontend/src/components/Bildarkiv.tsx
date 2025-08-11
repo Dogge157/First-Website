@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { buildApiUrl } from '../config';
 
 interface Photo {
   id: number;
@@ -50,9 +51,9 @@ const Bildarkiv: React.FC = () => {
 
   const fetchPhotos = async () => {
     try {
-      const url = selectedYear === 'all' 
-        ? 'http://localhost:5001/api/photos'
-        : `http://localhost:5001/api/photos?year=${selectedYear}`;
+          const url = selectedYear === 'all'
+      ? buildApiUrl('/api/photos')
+      : `${buildApiUrl('/api/photos')}?year=${selectedYear}`;
       
       const response = await fetch(url);
       if (response.ok) {
@@ -85,7 +86,7 @@ const Bildarkiv: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/photos', {
+      const response = await fetch(buildApiUrl('/api/photos'), {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -114,7 +115,7 @@ const Bildarkiv: React.FC = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/photos/${photoId}`, {
+      const response = await fetch(`${buildApiUrl('/api/photos')}/${photoId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -216,7 +217,7 @@ const Bildarkiv: React.FC = () => {
                         overflow: 'hidden'
                       }}>
                         <img 
-                          src={`http://localhost:5001${photo.url}`}
+                          src={`${buildApiUrl('')}${photo.url}`}
                           alt={photo.title}
                           style={{ 
                             width: '100%', 
@@ -299,7 +300,7 @@ const Bildarkiv: React.FC = () => {
                 overflow: 'hidden'
               }}>
                 <img 
-                  src={`http://localhost:5001${photo.url}`}
+                  src={`${buildApiUrl('')}${photo.url}`}
                   alt={photo.title}
                   style={{ 
                     width: '100%', 
