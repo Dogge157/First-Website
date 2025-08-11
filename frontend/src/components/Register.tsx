@@ -1,20 +1,24 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 
-const Register: React.FC = () => {
+interface RegisterProps {
+  onLogin: (user: any, token: string) => void;
+}
+
+const Register: React.FC<RegisterProps> = ({ onLogin }) => {
   const [formData, setFormData] = useState({
+    name: '',
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    group: ''
   });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const groups = ['Manägers', 'Assar', 'Gollar'];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -24,143 +28,171 @@ const Register: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Lösenorden matchar inte');
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError('Lösenordet måste vara minst 6 tecken långt');
+      return;
+    }
+
+    if (!formData.group) {
+      setError('Välj en grupp');
       return;
     }
 
     setLoading(true);
 
     try {
-      await axios.post('/api/users', {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
+      const response = await fetch('http://localhost:5000/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          group: formData.group
+        }),
       });
-      
-      setSuccess('Account created successfully! You can now login.');
-      setFormData({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-      });
-      
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-    } catch (error: any) {
-      setError(error.response?.data?.error || 'Registration failed. Please try again.');
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Auto-login after successful registration
+        const loginResponse = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: formData.username,
+            password: formData.password
+          }),
+        });
+
+        if (loginResponse.ok) {
+          const loginData = await loginResponse.json();
+          onLogin(loginData.user, loginData.access_token);
+        }
+      } else {
+        setError(data.error || 'Registrering misslyckades');
+      }
+    } catch (err) {
+      setError('Ett fel uppstod. Kontrollera att servern är igång.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-      <div className="card">
-        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Create Account</h2>
-        
-        {error && (
-          <div className="alert alert-error">
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="alert alert-success">
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username" className="form-label">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword" className="form-label">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="form-input"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="btn btn-primary"
-            style={{ width: '100%', marginTop: '1rem' }}
-            disabled={loading}
-          >
-            {loading ? 'Creating Account...' : 'Create Account'}
-          </button>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-          <p>
-            Already have an account?{' '}
-            <Link to="/login" style={{ color: '#3b82f6', textDecoration: 'none' }}>
-              Login here
-            </Link>
-          </p>
+    <div className="form-container">
+      <h1>Registrera dig</h1>
+      <p>Skapa ett konto för att delta i Skåre 2025</p>
+      
+      {error && (
+        <div className="alert alert-error">
+          {error}
         </div>
+      )}
+      
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Namn:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Ditt fullständiga namn"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="username">Användarnamn:</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            placeholder="Välj ett användarnamn"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="email">E-post:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="din.email@example.com"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="group">Grupp:</label>
+          <select
+            id="group"
+            name="group"
+            value={formData.group}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Välj din grupp</option>
+            {groups.map(group => (
+              <option key={group} value={group}>{group}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="password">Lösenord:</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Minst 6 tecken"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Bekräfta lösenord:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="Upprepa lösenordet"
+            required
+          />
+        </div>
+        
+        <button type="submit" className="btn" disabled={loading}>
+          {loading ? 'Registrerar...' : 'Registrera dig'}
+        </button>
+      </form>
+      
+      <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+        <p style={{ fontSize: '0.9rem', color: '#666' }}>
+          Genom att registrera dig godkänner du att delta i Skåre 2025.
+        </p>
       </div>
     </div>
   );

@@ -1,70 +1,120 @@
-import React, { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { AuthContext } from '../App';
+import React from 'react';
 
-const Navbar: React.FC = () => {
-  const { user, isAuthenticated, logout } = useContext(AuthContext);
-  const navigate = useNavigate();
+interface User {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+  group: string;
+}
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
+interface NavbarProps {
+  currentSection: string;
+  setCurrentSection: (section: string) => void;
+  showMenu: boolean;
+  setShowMenu: (show: boolean) => void;
+  isAuthenticated: boolean;
+  currentUser: User | null;
+  onLogout: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({
+  currentSection,
+  setCurrentSection,
+  showMenu,
+  setShowMenu,
+  isAuthenticated,
+  currentUser,
+  onLogout
+}) => {
+  const toggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
+
+  const handleNavClick = (section: string) => {
+    setCurrentSection(section);
+    setShowMenu(false);
   };
 
   return (
-    <nav style={{
-      background: 'white',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-      padding: '1rem 0',
-      marginBottom: '2rem'
-    }}>
-      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Link to="/" style={{ 
-          textDecoration: 'none', 
-          color: '#3b82f6', 
-          fontSize: '1.5rem', 
-          fontWeight: 'bold' 
-        }}>
-          Full-Stack App
-        </Link>
+    <nav className="navbar">
+      <div className="navbar-container">
+        <a href="#" className="logo" onClick={() => handleNavClick('home')}>
+          Skåre 2025
+        </a>
         
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <Link to="/" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-            Home
-          </Link>
-          <Link to="/statistics" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-            Statistics
-          </Link>
-          <Link to="/players" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-            Players
-          </Link>
-          
-          {isAuthenticated ? (
-            <>
-              <span style={{ color: '#6b7280' }}>
-                Welcome, {user?.username}!
-              </span>
-              <Link to="/dashboard" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-                Dashboard
-              </Link>
-              <Link to="/users" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-                Users
-              </Link>
-              <button onClick={handleLogout} className="btn btn-danger">
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="btn btn-primary" style={{ textDecoration: 'none' }}>
-                Login
-              </Link>
-              <Link to="/register" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-                Register
-              </Link>
-            </>
-          )}
-        </div>
+        <button className="menu-toggle" onClick={toggleMenu}>
+          ☰
+        </button>
+        
+        <ul className={`nav-menu ${showMenu ? 'show' : ''}`}>
+          <li>
+            <a 
+              href="#" 
+              className={currentSection === 'home' ? 'active' : ''}
+              onClick={() => handleNavClick('home')}
+            >
+              Hem
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#" 
+              className={currentSection === 'bildarkiv' ? 'active' : ''}
+              onClick={() => handleNavClick('bildarkiv')}
+            >
+              Bildarkiv
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#" 
+              className={currentSection === 'tävlingar' ? 'active' : ''}
+              onClick={() => handleNavClick('tävlingar')}
+            >
+              Tävlingar
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#" 
+              className={currentSection === 'snapsvisor' ? 'active' : ''}
+              onClick={() => handleNavClick('snapsvisor')}
+            >
+              Snapsvisor
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#" 
+              className={currentSection === 'deltagare' ? 'active' : ''}
+              onClick={() => handleNavClick('deltagare')}
+            >
+              Deltagare
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#" 
+              className={currentSection === 'omröstning' ? 'active' : ''}
+              onClick={() => handleNavClick('omröstning')}
+            >
+              Omröstning
+            </a>
+          </li>
+        </ul>
+        
+        {isAuthenticated && currentUser && (
+          <div className="user-section">
+            <div className="user-info">
+              <span>{currentUser.name}</span>
+              <span className="user-group">{currentUser.group}</span>
+            </div>
+            <button className="logout-btn" onClick={onLogout}>
+              Logga ut
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );
