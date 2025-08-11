@@ -13,7 +13,6 @@ const Deltagare: React.FC = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [selectedGroup, setSelectedGroup] = useState<string>('all');
 
   useEffect(() => {
     fetchParticipants();
@@ -21,12 +20,7 @@ const Deltagare: React.FC = () => {
 
   const fetchParticipants = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(buildApiUrl('/api/users'), {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch(buildApiUrl('/api/users'));
 
       if (response.ok) {
         const data = await response.json();
@@ -41,9 +35,7 @@ const Deltagare: React.FC = () => {
     }
   };
 
-  const filteredParticipants = selectedGroup === 'all' 
-    ? participants 
-    : participants.filter(p => p.group === selectedGroup);
+
 
   const groupCounts = {
     'Manägers': participants.filter(p => p.group === 'Manägers').length,
@@ -98,53 +90,102 @@ const Deltagare: React.FC = () => {
         </div>
       </div>
       
-      {/* Group Filter */}
-      <div style={{ marginBottom: '2rem' }}>
-        <label htmlFor="group-filter" style={{ marginRight: '1rem', fontWeight: '500' }}>
-          Filtrera efter grupp:
-        </label>
-        <select 
-          id="group-filter"
-          value={selectedGroup}
-          onChange={(e) => setSelectedGroup(e.target.value)}
-          style={{ padding: '0.5rem', borderRadius: '5px', border: '2px solid #ddd' }}
-        >
-          <option value="all">Alla grupper</option>
-          <option value="Manägers">Manägers</option>
-          <option value="Assar">Assar</option>
-          <option value="Gollar">Gollar</option>
-        </select>
-      </div>
+
       
-      {/* Participants List */}
-      <div className="grid grid-2">
-        {filteredParticipants.map(participant => (
-          <div key={participant.id} className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3>{participant.name}</h3>
-              <span 
-                className="user-group"
-                style={{
-                  backgroundColor: 
-                    participant.group === 'Manägers' ? '#dc3545' :
-                    participant.group === 'Assar' ? '#28a745' : '#007bff'
-                }}
-              >
-                {participant.group}
-              </span>
-            </div>
-            <p style={{ color: '#666', fontSize: '0.9rem' }}>
-              Registrerad: {new Date(participant.created_at).toLocaleDateString('sv-SE')}
-            </p>
+      {/* Participants List - Grouped by Group */}
+      <div className="grid grid-3">
+        {/* Manägers Group */}
+        <div className="card">
+          <h3 style={{ color: '#dc3545', textAlign: 'center', marginBottom: '1rem' }}>
+            Manägers ({participants.filter(p => p.group === 'Manägers').length})
+          </h3>
+          <div style={{ minHeight: '100px' }}>
+            {participants
+              .filter(p => p.group === 'Manägers')
+              .map(participant => (
+                <div key={participant.id} style={{ 
+                  padding: '0.5rem', 
+                  margin: '0.25rem 0', 
+                  backgroundColor: '#f8f9fa', 
+                  borderRadius: '5px',
+                  borderLeft: '3px solid #dc3545'
+                }}>
+                  <strong>{participant.name}</strong>
+                  <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                    Registrerad: {new Date(participant.created_at).toLocaleDateString('sv-SE')}
+                  </div>
+                </div>
+              ))}
+            {participants.filter(p => p.group === 'Manägers').length === 0 && (
+              <p style={{ textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                Inga deltagare ännu
+              </p>
+            )}
           </div>
-        ))}
+        </div>
+
+        {/* Assar Group */}
+        <div className="card">
+          <h3 style={{ color: '#28a745', textAlign: 'center', marginBottom: '1rem' }}>
+            Assar ({participants.filter(p => p.group === 'Assar').length})
+          </h3>
+          <div style={{ minHeight: '100px' }}>
+            {participants
+              .filter(p => p.group === 'Assar')
+              .map(participant => (
+                <div key={participant.id} style={{ 
+                  padding: '0.5rem', 
+                  margin: '0.25rem 0', 
+                  backgroundColor: '#f8f9fa', 
+                  borderRadius: '5px',
+                  borderLeft: '3px solid #28a745'
+                }}>
+                  <strong>{participant.name}</strong>
+                  <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                    Registrerad: {new Date(participant.created_at).toLocaleDateString('sv-SE')}
+                  </div>
+                </div>
+              ))}
+            {participants.filter(p => p.group === 'Assar').length === 0 && (
+              <p style={{ textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                Inga deltagare ännu
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Gollar Group */}
+        <div className="card">
+          <h3 style={{ color: '#007bff', textAlign: 'center', marginBottom: '1rem' }}>
+            Gollar ({participants.filter(p => p.group === 'Gollar').length})
+          </h3>
+          <div style={{ minHeight: '100px' }}>
+            {participants
+              .filter(p => p.group === 'Gollar')
+              .map(participant => (
+                <div key={participant.id} style={{ 
+                  padding: '0.5rem', 
+                  margin: '0.25rem 0', 
+                  backgroundColor: '#f8f9fa', 
+                  borderRadius: '5px',
+                  borderLeft: '3px solid #007bff'
+                }}>
+                  <strong>{participant.name}</strong>
+                  <div style={{ fontSize: '0.8rem', color: '#666' }}>
+                    Registrerad: {new Date(participant.created_at).toLocaleDateString('sv-SE')}
+                  </div>
+                </div>
+              ))}
+            {participants.filter(p => p.group === 'Gollar').length === 0 && (
+              <p style={{ textAlign: 'center', color: '#666', fontStyle: 'italic' }}>
+                Inga deltagare ännu
+              </p>
+            )}
+          </div>
+        </div>
       </div>
       
-      {filteredParticipants.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '3rem' }}>
-          <p>Inga deltagare hittades för den valda gruppen.</p>
-        </div>
-      )}
+
       
       <div className="card" style={{ marginTop: '2rem' }}>
         <h3>Om grupperna</h3>

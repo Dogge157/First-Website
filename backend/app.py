@@ -147,10 +147,15 @@ def verify_password():
         return jsonify({'verified': False, 'message': 'Fel lösenord'}), 401
 
 @app.route('/api/users', methods=['GET'])
-@jwt_required()
 def get_users():
     users = User.query.all()
-    return jsonify([user.to_dict() for user in users])
+    # Return only public information for the Deltagare section
+    return jsonify([{
+        'id': user.id,
+        'name': user.name,
+        'group': user.group,
+        'created_at': user.created_at.isoformat()
+    } for user in users])
 
 @app.route('/api/users', methods=['POST'])
 def create_user():
