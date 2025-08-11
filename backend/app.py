@@ -215,6 +215,12 @@ def update_user(user_id):
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
+    current_user_id = get_jwt_identity()
+    
+    # Ensure user can only delete their own account
+    if current_user_id != user_id:
+        return jsonify({'error': 'Du kan endast radera ditt eget konto'}), 403
+    
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
