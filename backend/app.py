@@ -60,6 +60,25 @@ def missing_token_callback(error):
     print(f"Missing JWT token: {error}")
     return jsonify({'error': 'Token saknas'}), 401
 
+@jwt.needs_fresh_token_loader
+def token_not_fresh_callback(jwt_header, jwt_payload):
+    print(f"Token not fresh: {jwt_payload}")
+    return jsonify({'error': 'Token behöver vara färsk'}), 401
+
+@jwt.revoked_token_loader
+def revoked_token_callback(jwt_header, jwt_payload):
+    print(f"Token revoked: {jwt_payload}")
+    return jsonify({'error': 'Token har återkallats'}), 401
+
+# Global error handler for JWT errors
+@app.errorhandler(422)
+def handle_422_error(error):
+    print(f"422 error occurred: {error}")
+    print(f"Request method: {request.method}")
+    print(f"Request path: {request.path}")
+    print(f"Request headers: {dict(request.headers)}")
+    return jsonify({'error': 'Ogiltig förfrågan - JWT token problem'}), 422
+
 # Database Models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -236,6 +255,12 @@ def update_user(user_id):
 @app.route('/api/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
+    print(f"=== DELETE USER ENDPOINT REACHED ===")
+    print(f"Request method: {request.method}")
+    print(f"Request path: {request.path}")
+    print(f"User ID to delete: {user_id}")
+    print(f"Request headers: {dict(request.headers)}")
+    
     try:
         current_user_id = get_jwt_identity()
         print(f"Delete user request - User ID: {user_id}, Current user ID: {current_user_id}")
