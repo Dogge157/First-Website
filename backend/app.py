@@ -77,7 +77,23 @@ def handle_422_error(error):
     print(f"Request method: {request.method}")
     print(f"Request path: {request.path}")
     print(f"Request headers: {dict(request.headers)}")
+    
+    # Check if this is a JWT-related error
+    auth_header = request.headers.get('Authorization', '')
+    if auth_header.startswith('Bearer '):
+        token = auth_header[7:]  # Remove 'Bearer ' prefix
+        print(f"Token being used: {token[:20]}...")  # Show first 20 chars for debugging
+    
     return jsonify({'error': 'Ogiltig förfrågan - JWT token problem'}), 422
+
+# Additional error handler for JWT validation errors
+@app.errorhandler(Exception)
+def handle_exception(e):
+    print(f"Unhandled exception: {str(e)}")
+    if "Subject must be a string" in str(e):
+        print("JWT token validation error - Subject must be a string")
+        return jsonify({'error': 'JWT token är ogiltig - logga in igen'}), 401
+    return jsonify({'error': 'Ett fel uppstod på servern'}), 500
 
 # Database Models
 class User(db.Model):

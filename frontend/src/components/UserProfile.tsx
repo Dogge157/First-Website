@@ -34,6 +34,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogout, onClose }) =>
       const token = localStorage.getItem('token');
       console.log('Delete account - User ID:', user.id);
       console.log('Delete account - Token:', token ? 'Present' : 'Missing');
+      console.log('Full token for debugging:', token);
       
       const response = await fetch(`${buildApiUrl('/api/users')}/${user.id}`, {
         method: 'DELETE',
@@ -56,8 +57,15 @@ const UserProfile: React.FC<UserProfileProps> = ({ user, onLogout, onClose }) =>
         console.log('Delete error response:', data);
         
         // Check for specific JWT errors
-        if (response.status === 401) {
+        if (response.status === 401 || (data.msg && data.msg.includes('Subject must be a string'))) {
           setError('Din session har utgått. Logga in igen för att radera ditt konto.');
+          // Automatically logout and close modal
+          setTimeout(() => {
+            onLogout();
+            onClose();
+          }, 3000);
+        } else if (response.status === 422) {
+          setError('JWT token problem - logga in igen för att radera ditt konto.');
           // Automatically logout and close modal
           setTimeout(() => {
             onLogout();
