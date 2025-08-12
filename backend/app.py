@@ -324,7 +324,7 @@ def login():
 @jwt_required()
 def get_profile():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    user = User.query.get(int(current_user_id))
     return jsonify(user.to_dict())
 
 @app.route('/api/groups', methods=['GET'])
@@ -337,38 +337,31 @@ def get_votes():
     return jsonify([vote.to_dict() for vote in votes])
 
 @app.route('/api/votes', methods=['POST'])
+@jwt_required()
 def create_vote():
     data = request.get_json()
     
     if not data or not data.get('vote_option') or not data.get('vote_value'):
         return jsonify({'error': 'Röstningsalternativ och värde krävs'}), 400
     
-    # Check if user is authenticated
-    current_user_id = None
-    user_name = data.get('user_name', 'Anonym')
-    
-    try:
-        current_user_id = get_jwt_identity()
-        if current_user_id:
-            user = User.query.get(current_user_id)
-            if user:
-                user_name = user.name
-    except:
-        # No valid token, this is an anonymous vote
-        pass
+    # Get authenticated user
+    current_user_id = get_jwt_identity()
+    user = User.query.get(int(current_user_id))
+    if not user:
+        return jsonify({'error': 'Användare hittades inte'}), 404
     
     # Check if user has already voted on this question
     existing_vote = Vote.query.filter_by(
         vote_option=data['vote_option'],
-        user_name=user_name
+        user_name=user.name
     ).first()
     
     if existing_vote:
         return jsonify({'error': 'Du har redan röstat på denna fråga'}), 400
     
     new_vote = Vote(
-        user_id=current_user_id,
-        user_name=user_name,
+        user_id=int(current_user_id),
+        user_name=user.name,
         vote_option=data['vote_option'],
         vote_value=data['vote_value']
     )
@@ -385,25 +378,18 @@ def get_voting_questions():
     return jsonify([question.to_dict() for question in questions])
 
 @app.route('/api/voting-questions', methods=['POST'])
+@jwt_required()
 def create_voting_question():
     data = request.get_json()
     
     if not data or not data.get('title') or not data.get('alternatives'):
         return jsonify({'error': 'Titel och alternativ krävs'}), 400
     
-    # Check if user is authenticated
-    current_user_id = None
-    user_name = data.get('user_name', 'Anonym')
-    
-    try:
-        current_user_id = get_jwt_identity()
-        if current_user_id:
-            user = User.query.get(current_user_id)
-            if user:
-                user_name = user.name
-    except:
-        # No valid token, this is an anonymous question
-        pass
+    # Get authenticated user
+    current_user_id = get_jwt_identity()
+    user = User.query.get(int(current_user_id))
+    if not user:
+        return jsonify({'error': 'Användare hittades inte'}), 404
     
     # Validate alternatives
     alternatives = data['alternatives']
@@ -414,8 +400,8 @@ def create_voting_question():
         title=data['title'],
         description=data.get('description', ''),
         alternatives=json.dumps(alternatives),
-        created_by=current_user_id,
-        created_by_name=user_name
+        created_by=int(current_user_id),
+        created_by_name=user.name
     )
     
     db.session.add(new_question)
@@ -444,7 +430,7 @@ def delete_voting_question(question_id):
     question = VotingQuestion.query.get_or_404(question_id)
     
     # Only creator can delete
-    if question.created_by != current_user_id:
+    if question.created_by != int(current_user_id) if current_user_id else None:
         return jsonify({'error': 'Du kan bara radera dina egna röstningsfrågor'}), 403
     
     # Delete all votes for this question
@@ -512,7 +498,7 @@ def upload_photo():
         title=title,
         description=description,
         year=year,
-        uploaded_by=current_user_id
+        uploaded_by=int(current_user_id)
     )
     
     db.session.add(new_photo)
@@ -527,7 +513,7 @@ def delete_photo(photo_id):
     photo = Photo.query.get_or_404(photo_id)
     
     # Only allow deletion by uploader or admin (you can add admin check later)
-    if photo.uploaded_by != current_user_id:
+    if photo.uploaded_by != int(current_user_id):
         return jsonify({'error': 'Du kan bara radera dina egna bilder'}), 403
     
     # Delete file

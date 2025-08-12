@@ -32,7 +32,6 @@ const Omröstning: React.FC = () => {
   const [success, setSuccess] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [voterName, setVoterName] = useState('');
   
   // Create question form state
   const [createForm, setCreateForm] = useState({
@@ -50,7 +49,6 @@ const Omröstning: React.FC = () => {
     const userData = localStorage.getItem('user');
     if (userData) {
       setCurrentUser(JSON.parse(userData));
-      setVoterName(JSON.parse(userData).name);
     }
   };
 
@@ -83,35 +81,33 @@ const Omröstning: React.FC = () => {
   const handleCreateQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!currentUser) {
+      setError('Du måste logga in för att skapa en röstningsfråga');
+      return;
+    }
+    
     if (!createForm.title.trim() || createForm.alternatives.filter(alt => alt.trim()).length < 2) {
       setError('Titel och minst 2 alternativ krävs');
       return;
     }
 
-    // For anonymous users, require a name
-    if (!currentUser && !voterName.trim()) {
-      setError('Ange ditt namn för att skapa en röstningsfråga');
-      return;
-    }
-
     try {
       const token = localStorage.getItem('token');
-      const headers: any = {
-        'Content-Type': 'application/json'
-      };
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (!token) {
+        setError('Du måste logga in för att skapa en röstningsfråga');
+        return;
       }
 
       const response = await fetch(buildApiUrl('/api/voting-questions'), {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           title: createForm.title.trim(),
           description: createForm.description.trim(),
-          alternatives: createForm.alternatives.filter(alt => alt.trim()),
-          user_name: voterName.trim() || 'Anonym'
+          alternatives: createForm.alternatives.filter(alt => alt.trim())
         })
       });
 
@@ -131,29 +127,27 @@ const Omröstning: React.FC = () => {
   };
 
   const handleVote = async (questionId: number, voteValue: string) => {
-    // For anonymous users, require a name
-    if (!currentUser && !voterName.trim()) {
-      setError('Ange ditt namn för att rösta');
+    if (!currentUser) {
+      setError('Du måste logga in för att rösta');
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
-      const headers: any = {
-        'Content-Type': 'application/json'
-      };
-      
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (!token) {
+        setError('Du måste logga in för att rösta');
+        return;
       }
 
       const response = await fetch(buildApiUrl('/api/votes'), {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           vote_option: questionId.toString(),
-          vote_value: voteValue,
-          user_name: voterName.trim() || 'Anonym'
+          vote_value: voteValue
         })
       });
 
@@ -219,19 +213,21 @@ const Omröstning: React.FC = () => {
   };
 
   const hasUserVoted = (questionId: number) => {
+    if (!currentUser) return false;
+    
     const questionVoteData = questionVotes.find(qv => qv.question.id === questionId);
     if (!questionVoteData) return false;
     
-    const userName = currentUser ? currentUser.name : voterName;
-    return questionVoteData.votes.some(vote => vote.user_name === userName);
+    return questionVoteData.votes.some(vote => vote.user_name === currentUser.name);
   };
 
   const getUserVote = (questionId: number) => {
+    if (!currentUser) return null;
+    
     const questionVoteData = questionVotes.find(qv => qv.question.id === questionId);
     if (!questionVoteData) return null;
     
-    const userName = currentUser ? currentUser.name : voterName;
-    const userVote = questionVoteData.votes.find(vote => vote.user_name === userName);
+    const userVote = questionVoteData.votes.find(vote => vote.user_name === currentUser.name);
     return userVote ? userVote.vote_value : null;
   };
 
@@ -261,15 +257,27 @@ const Omröstning: React.FC = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <div>
           <h1>Omröstning</h1>
-          <p>Skapa och delta i röstningar för att forma Skåre 2025! Alla kan rösta och skapa frågor.</p>
+          <p>Skapa och delta i röstningar för att forma Skåre 2025! Logga in för att rösta och skapa frågor.</p>
+          {!currentUser && (
+            <p style={{ 
+              fontSize: '0.9rem', 
+              color: '#666', 
+              fontStyle: 'italic',
+              marginTop: '0.5rem'
+            }}>
+              Du måste logga in för att rösta och skapa röstningsfrågor.
+            </p>
+          )}
         </div>
-        <button 
-          className="btn"
-          onClick={() => setShowCreateForm(true)}
-          style={{ backgroundColor: '#28a745' }}
-        >
-          ➕ Skapa ny röstning
-        </button>
+        {currentUser && (
+          <button 
+            className="btn"
+            onClick={() => setShowCreateForm(true)}
+            style={{ backgroundColor: '#28a745' }}
+          >
+            ➕ Skapa ny röstning
+          </button>
+        )}
       </div>
       
       {error && (
@@ -284,18 +292,33 @@ const Omröstning: React.FC = () => {
         </div>
       )}
       
-      {/* Anonymous user name input */}
+      {/* Login required message */}
       {!currentUser && (
-        <div className="card" style={{ marginBottom: '2rem' }}>
-          <h3>Ditt namn</h3>
-          <p>Ange ditt namn för att kunna rösta och skapa röstningsfrågor:</p>
-          <input
-            type="text"
-            value={voterName}
-            onChange={(e) => setVoterName(e.target.value)}
-            placeholder="Ange ditt namn"
-            style={{ width: '100%', padding: '0.5rem', borderRadius: '5px', border: '2px solid #ddd' }}
-          />
+        <div className="card" style={{ marginBottom: '2rem', textAlign: 'center', padding: '2rem' }}>
+          <h3>🔐 Inloggning krävs</h3>
+          <p>Du måste logga in för att kunna rösta och skapa röstningsfrågor.</p>
+          <div style={{ 
+            backgroundColor: '#f8f9fa', 
+            padding: '1rem', 
+            borderRadius: '8px',
+            marginTop: '1rem'
+          }}>
+            <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: '#666' }}>
+              Logga in för att:
+            </p>
+            <ul style={{ 
+              textAlign: 'left', 
+              margin: '0', 
+              paddingLeft: '1.5rem',
+              fontSize: '0.9rem',
+              color: '#666'
+            }}>
+              <li>Skapa nya röstningsfrågor</li>
+              <li>Rösta på befintliga frågor</li>
+              <li>Se dina röster och resultat</li>
+              <li>Radera dina egna röstningsfrågor</li>
+            </ul>
+          </div>
         </div>
       )}
       
@@ -304,13 +327,26 @@ const Omröstning: React.FC = () => {
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
           <h3>Inga röstningsfrågor ännu</h3>
           <p>Bli den första att skapa en röstningsfråga!</p>
-          <button 
-            className="btn"
-            onClick={() => setShowCreateForm(true)}
-            style={{ marginTop: '1rem', backgroundColor: '#28a745' }}
-          >
-            Skapa första röstningen
-          </button>
+          {currentUser ? (
+            <button 
+              className="btn"
+              onClick={() => setShowCreateForm(true)}
+              style={{ marginTop: '1rem', backgroundColor: '#28a745' }}
+            >
+              Skapa första röstningen
+            </button>
+          ) : (
+            <div style={{ 
+              backgroundColor: '#f8f9fa', 
+              padding: '1rem', 
+              borderRadius: '8px',
+              marginTop: '1rem',
+              fontSize: '0.9rem',
+              color: '#666'
+            }}>
+              Logga in för att skapa den första röstningsfrågan
+            </div>
+          )}
         </div>
       ) : (
         <div>
@@ -349,36 +385,51 @@ const Omröstning: React.FC = () => {
                   )}
                 </div>
                 
-                {userVoted ? (
-                  <div style={{ marginBottom: '1rem' }}>
-                    <div style={{ 
-                      backgroundColor: '#d4edda', 
-                      color: '#155724', 
-                      padding: '0.5rem 1rem', 
-                      borderRadius: '5px',
-                      display: 'inline-block'
-                    }}>
-                      ✅ Du röstade på: <strong>{userVote}</strong>
+                {currentUser ? (
+                  userVoted ? (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <div style={{ 
+                        backgroundColor: '#d4edda', 
+                        color: '#155724', 
+                        padding: '0.5rem 1rem', 
+                        borderRadius: '5px',
+                        display: 'inline-block'
+                      }}>
+                        ✅ Du röstade på: <strong>{userVote}</strong>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div style={{ marginBottom: '1rem' }}>
+                      <h4>Rösta här:</h4>
+                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        {question.alternatives.map((alternative, index) => (
+                          <button
+                            key={index}
+                            onClick={() => handleVote(question.id, alternative)}
+                            className="btn"
+                            style={{ 
+                              backgroundColor: '#667eea',
+                              fontSize: '0.9rem',
+                              padding: '0.5rem 1rem'
+                            }}
+                          >
+                            {alternative}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
                 ) : (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h4>Rösta här:</h4>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                      {question.alternatives.map((alternative, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handleVote(question.id, alternative)}
-                          className="btn"
-                          style={{ 
-                            backgroundColor: '#667eea',
-                            fontSize: '0.9rem',
-                            padding: '0.5rem 1rem'
-                          }}
-                        >
-                          {alternative}
-                        </button>
-                      ))}
+                    <div style={{ 
+                      backgroundColor: '#f8f9fa', 
+                      color: '#6c757d', 
+                      padding: '0.5rem 1rem', 
+                      borderRadius: '5px',
+                      display: 'inline-block',
+                      fontSize: '0.9rem'
+                    }}>
+                      🔐 Logga in för att rösta
                     </div>
                   </div>
                 )}

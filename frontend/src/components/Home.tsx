@@ -3,9 +3,10 @@ import Register from './Register';
 
 interface HomeProps {
   onRegister: (user: any, token: string) => void;
+  isAuthenticated?: boolean;
 }
 
-const Home: React.FC<HomeProps> = ({ onRegister }) => {
+const Home: React.FC<HomeProps> = ({ onRegister, isAuthenticated = false }) => {
   const [showRegister, setShowRegister] = useState(false);
 
   return (
@@ -28,25 +29,41 @@ const Home: React.FC<HomeProps> = ({ onRegister }) => {
           }}
         />
         
-        {/* Registration button */}
-        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <button 
-            className="btn" 
-            onClick={() => setShowRegister(true)}
-            style={{ 
-              fontSize: '1.2rem',
-              padding: '1rem 2rem',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
+        {/* Registration button - only show if not authenticated */}
+        {!isAuthenticated ? (
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <button 
+              className="btn" 
+              onClick={() => setShowRegister(true)}
+              style={{ 
+                fontSize: '1.2rem',
+                padding: '1rem 2rem',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s'
+              }}
+            >
+              Registrera dig
+            </button>
+          </div>
+        ) : (
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <div style={{ 
+              backgroundColor: '#d4edda', 
+              color: '#155724', 
+              padding: '1rem 2rem', 
               borderRadius: '8px',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s'
-            }}
-          >
-            Registrera dig
-          </button>
-        </div>
+              border: '1px solid #c3e6cb'
+            }}>
+              <p style={{ margin: 0, fontSize: '1.1rem' }}>
+                Välkommen tillbaka! Du är inloggad och kan använda alla funktioner.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
       
       {showRegister && (

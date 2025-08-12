@@ -26,6 +26,8 @@ const Bildarkiv: React.FC = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<Photo | null>(null);
   const [uploadForm, setUploadForm] = useState({
     title: '',
     description: '',
@@ -134,6 +136,31 @@ const Bildarkiv: React.FC = () => {
     }
   };
 
+  const handleImageClick = (photo: Photo) => {
+    setSelectedImage(photo);
+    setShowImageModal(true);
+  };
+
+  // Handle keyboard events for the image modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (showImageModal && event.key === 'Escape') {
+        setShowImageModal(false);
+      }
+    };
+
+    if (showImageModal) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showImageModal]);
+
   const groupedPhotos = photos.reduce((acc, photo) => {
     if (!acc[photo.year]) {
       acc[photo.year] = [];
@@ -157,12 +184,39 @@ const Bildarkiv: React.FC = () => {
         <div>
           <h1>Bildarkiv</h1>
           <p>Bläddra bland bilder från Skåre evenemang från 2022 och framåt.</p>
+          {!currentUser && (
+            <p style={{ 
+              fontSize: '0.9rem', 
+              color: '#666', 
+              fontStyle: 'italic',
+              marginTop: '0.5rem'
+            }}>
+              Logga in för att ladda upp egna bilder till arkivet.
+            </p>
+          )}
         </div>
         {currentUser && (
           <button 
             className="btn"
             onClick={() => setShowUpload(true)}
-            style={{ backgroundColor: '#28a745' }}
+            style={{ 
+              backgroundColor: '#28a745',
+              fontSize: '1.1rem',
+              padding: '0.75rem 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+            }}
           >
             📸 Ladda upp bild
           </button>
@@ -202,33 +256,43 @@ const Bildarkiv: React.FC = () => {
               </h2>
               
               {groupedPhotos[year] && groupedPhotos[year].length > 0 ? (
-                <div className="grid grid-3">
+                <div className="grid grid-4">
                   {groupedPhotos[year].map(photo => (
-                    <div key={photo.id} className="card">
+                    <div key={photo.id} className="card" style={{ padding: '1rem' }}>
                       <div style={{ 
                         backgroundColor: '#f8f9fa', 
-                        height: '200px', 
+                        height: '150px', 
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        marginBottom: '1rem',
+                        marginBottom: '0.75rem',
                         border: '2px solid #dee2e6',
-                        overflow: 'hidden'
-                      }}>
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.02)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                      onClick={() => handleImageClick(photo)}
+                      >
                         <img 
                           src={`${buildApiUrl('')}${photo.url}`}
                           alt={photo.title}
                           style={{ 
-                            width: '100%', 
-                            height: '100%', 
-                            objectFit: 'cover' 
+                            maxWidth: '100%', 
+                            maxHeight: '100%', 
+                            objectFit: 'contain' 
                           }}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.style.display = 'none';
                             target.parentElement!.innerHTML = `
-                              <span style="color: #6c757d; font-size: 0.9rem;">
+                              <span style="color: #6c757d; font-size: 0.8rem;">
                                 Bild från ${photo.year}
                               </span>
                             `;
@@ -285,33 +349,43 @@ const Bildarkiv: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-3">
+        <div className="grid grid-4">
           {photos.map(photo => (
-            <div key={photo.id} className="card">
+            <div key={photo.id} className="card" style={{ padding: '1rem' }}>
               <div style={{ 
                 backgroundColor: '#f8f9fa', 
-                height: '200px', 
+                height: '150px', 
                 borderRadius: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: '1rem',
+                marginBottom: '0.75rem',
                 border: '2px solid #dee2e6',
-                overflow: 'hidden'
-              }}>
+                overflow: 'hidden',
+                cursor: 'pointer',
+                transition: 'transform 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.02)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+              onClick={() => handleImageClick(photo)}
+              >
                 <img 
                   src={`${buildApiUrl('')}${photo.url}`}
                   alt={photo.title}
                   style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'cover' 
+                    maxWidth: '100%', 
+                    maxHeight: '100%', 
+                    objectFit: 'contain' 
                   }}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
                     target.parentElement!.innerHTML = `
-                      <span style="color: #6c757d; font-size: 0.9rem;">
+                      <span style="color: #6c757d; font-size: 0.8rem;">
                         Bild från ${photo.year}
                       </span>
                     `;
@@ -499,6 +573,102 @@ const Bildarkiv: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      
+      {/* Image Modal */}
+      {showImageModal && selectedImage && (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          backgroundColor: 'rgba(0,0,0,0.9)', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          zIndex: 2000
+        }}
+        onClick={() => setShowImageModal(false)}
+        >
+          <div style={{ 
+            position: 'relative',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <button 
+              onClick={() => setShowImageModal(false)}
+              style={{ 
+                position: 'absolute',
+                top: '-40px',
+                right: '0',
+                background: 'none', 
+                border: 'none', 
+                fontSize: '2rem', 
+                cursor: 'pointer',
+                color: 'white',
+                zIndex: 2001
+              }}
+            >
+              ×
+            </button>
+            
+            {/* Image */}
+            <img 
+              src={`${buildApiUrl('')}${selectedImage.url}`}
+              alt={selectedImage.title}
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '80vh', 
+                objectFit: 'contain',
+                borderRadius: '8px'
+              }}
+            />
+            
+            {/* Image info */}
+            <div style={{ 
+              backgroundColor: 'rgba(255,255,255,0.95)', 
+              padding: '1rem', 
+              borderRadius: '8px',
+              marginTop: '1rem',
+              maxWidth: '100%',
+              textAlign: 'center'
+            }}>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>
+                {selectedImage.title}
+              </h3>
+              {selectedImage.description && (
+                <p style={{ margin: '0 0 0.5rem 0', color: '#666', fontSize: '0.9rem' }}>
+                  {selectedImage.description}
+                </p>
+              )}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                gap: '1rem',
+                fontSize: '0.8rem',
+                color: '#666'
+              }}>
+                <span style={{ 
+                  backgroundColor: '#667eea', 
+                  color: 'white', 
+                  padding: '0.25rem 0.5rem', 
+                  borderRadius: '15px'
+                }}>
+                  {selectedImage.year}
+                </span>
+                <span>Uppladdad av: {selectedImage.uploaded_by}</span>
+              </div>
+            </div>
           </div>
         </div>
       )}

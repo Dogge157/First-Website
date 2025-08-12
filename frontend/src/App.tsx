@@ -137,7 +137,7 @@ function App() {
   const renderSection = () => {
     switch (currentSection) {
       case 'home':
-        return <Home onRegister={handleRegister} />;
+        return <Home onRegister={handleRegister} isAuthenticated={isAuthenticated} />;
       case 'bildarkiv':
         return <Bildarkiv />;
       case 'tävlingar':
@@ -149,7 +149,7 @@ function App() {
       case 'omröstning':
         return <Omröstning />;
       default:
-        return <Home onRegister={handleRegister} />;
+        return <Home onRegister={handleRegister} isAuthenticated={isAuthenticated} />;
     }
   };
 
