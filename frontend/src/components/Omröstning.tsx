@@ -327,15 +327,7 @@ const Omröstning: React.FC = () => {
         <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
           <h3>Inga röstningsfrågor ännu</h3>
           <p>Bli den första att skapa en röstningsfråga!</p>
-          {currentUser ? (
-            <button 
-              className="btn"
-              onClick={() => setShowCreateForm(true)}
-              style={{ marginTop: '1rem', backgroundColor: '#28a745' }}
-            >
-              Skapa första röstningen
-            </button>
-          ) : (
+          {!currentUser && (
             <div style={{ 
               backgroundColor: '#f8f9fa', 
               padding: '1rem', 

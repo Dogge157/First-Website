@@ -54,8 +54,25 @@ const Deltagare: React.FC = () => {
 
   return (
     <div className="section">
-      <h1>Deltagare</h1>
-      <p>Se alla deltagare och deras tillhörighet till de tre grupperna.</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h1>Deltagare</h1>
+          <p>Se alla deltagare och deras tillhörighet till de tre grupperna.</p>
+        </div>
+        <button 
+          className="btn"
+          onClick={fetchParticipants}
+          disabled={loading}
+          style={{ 
+            backgroundColor: '#667eea',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          🔄 {loading ? 'Uppdaterar...' : 'Uppdatera'}
+        </button>
+      </div>
       
       {error && (
         <div className="alert alert-error">
@@ -63,6 +80,21 @@ const Deltagare: React.FC = () => {
         </div>
       )}
       
+      {/* Total Participants */}
+      <div className="card" style={{ 
+        textAlign: 'center', 
+        marginBottom: '2rem',
+        backgroundColor: '#667eea',
+        color: 'white',
+        padding: '1.5rem'
+      }}>
+        <h2 style={{ margin: '0 0 0.5rem 0' }}>📊 Total Deltagare</h2>
+        <div style={{ fontSize: '3rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+          {participants.length}
+        </div>
+        <p style={{ margin: 0, opacity: 0.9 }}>registrerade deltagare</p>
+      </div>
+
       {/* Group Statistics */}
       <div className="grid grid-3" style={{ marginBottom: '2rem' }}>
         <div className="card" style={{ textAlign: 'center' }}>
