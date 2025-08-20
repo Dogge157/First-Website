@@ -40,7 +40,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Initialize extensions
-CORS(app)
+CORS(app, origins=["*"], methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], allow_headers=["Content-Type", "Authorization"])
 db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
@@ -187,8 +187,11 @@ class Photo(db.Model):
 def health_check():
     return jsonify({'status': 'healthy', 'message': 'Backend is running!'})
 
-@app.route('/api/verify-password', methods=['POST'])
+@app.route('/api/verify-password', methods=['POST', 'GET'])
 def verify_password():
+    if request.method == 'GET':
+        return jsonify({'error': 'This endpoint requires a POST request'}), 405
+    
     data = request.get_json()
     password = data.get('password', '')
     
@@ -530,6 +533,10 @@ def delete_photo(photo_id):
 @app.route('/uploads/<path:filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/favicon.ico')
+def favicon():
+    return '', 204  # No content response
 
 if __name__ == '__main__':
     with app.app_context():
