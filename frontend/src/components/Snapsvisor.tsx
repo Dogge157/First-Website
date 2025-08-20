@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PasswordProtection from './PasswordProtection';
 
 interface Song {
   id: number;
@@ -243,171 +244,177 @@ Bagge skålar, snear och tackar`
   ];
 
   return (
-    <div className="section">
-      <h1>Snapsvisor</h1>
-      <p>En samling av snapsvisor för att skapa stämning under Skåre 2025!</p>
-      
-      {/* Song Grid */}
-      <div className="grid grid-3" style={{ marginBottom: '2rem' }}>
-        {songs.map((song) => (
-          <div 
-            key={song.id} 
-            className="card" 
-            style={{ 
-              cursor: 'pointer',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              border: '2px solid #667eea'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-5px)';
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-            }}
-            onClick={() => setSelectedSong(song)}
-          >
-            <div style={{ 
-              backgroundColor: '#667eea', 
-              color: 'white', 
-              padding: '0.5rem', 
-              borderRadius: '5px',
-              marginBottom: '1rem',
-              textAlign: 'center',
-              fontSize: '0.9rem'
-            }}>
-              🍺 {song.id}
-            </div>
-            <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{song.title}</h3>
-            {song.melody && (
-              <p style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic', marginBottom: '0.5rem' }}>
-                Melodi: {song.melody}
-              </p>
-            )}
-            <p style={{ fontSize: '0.9rem', color: '#666' }}>
-              Klicka för att läsa texten
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Song Modal */}
-      {selectedSong && (
-        <div style={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          right: 0, 
-          bottom: 0, 
-          backgroundColor: 'rgba(0,0,0,0.8)', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          zIndex: 1000
-        }}
-        onClick={() => setSelectedSong(null)}
-        >
-          <div style={{ 
-            backgroundColor: 'white', 
-            padding: '2rem', 
-            borderRadius: '15px',
-            maxWidth: '600px',
-            width: '90%',
-            maxHeight: '80vh',
-            overflowY: 'auto',
-            position: 'relative'
-          }}
-          onClick={(e) => e.stopPropagation()}
-          >
-            <button 
-              onClick={() => setSelectedSong(null)}
+    <PasswordProtection 
+      correctPassword="snaps"
+      title="Snapsvisor"
+      description="Ange lösenord för att komma åt snapsvisorna för Skåre 2025"
+    >
+      <div className="section">
+        <h1>Snapsvisor</h1>
+        <p>En samling av snapsvisor för att skapa stämning under Skåre 2025!</p>
+        
+        {/* Song Grid */}
+        <div className="grid grid-3" style={{ marginBottom: '2rem' }}>
+          {songs.map((song) => (
+            <div 
+              key={song.id} 
+              className="card" 
               style={{ 
-                position: 'absolute',
-                top: '1rem',
-                right: '1rem',
-                background: 'none', 
-                border: 'none', 
-                fontSize: '1.5rem', 
                 cursor: 'pointer',
-                color: '#666'
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                border: '2px solid #667eea'
               }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+              }}
+              onClick={() => setSelectedSong(song)}
             >
-              ×
-            </button>
-            
-            <div style={{ 
-              backgroundColor: '#667eea', 
-              color: 'white', 
-              padding: '1rem', 
-              borderRadius: '10px',
-              marginBottom: '1.5rem',
-              textAlign: 'center'
-            }}>
-              <h2 style={{ margin: '0 0 0.5rem 0' }}>🍺 {selectedSong.title}</h2>
-              {selectedSong.melody && (
-                <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>
-                  Melodi: {selectedSong.melody}
+              <div style={{ 
+                backgroundColor: '#667eea', 
+                color: 'white', 
+                padding: '0.5rem', 
+                borderRadius: '5px',
+                marginBottom: '1rem',
+                textAlign: 'center',
+                fontSize: '0.9rem'
+              }}>
+                🍺 {song.id}
+              </div>
+              <h3 style={{ marginBottom: '0.5rem', color: '#333' }}>{song.title}</h3>
+              {song.melody && (
+                <p style={{ fontSize: '0.8rem', color: '#666', fontStyle: 'italic', marginBottom: '0.5rem' }}>
+                  Melodi: {song.melody}
                 </p>
               )}
+              <p style={{ fontSize: '0.9rem', color: '#666' }}>
+                Klicka för att läsa texten
+              </p>
             </div>
-            
+          ))}
+        </div>
+
+        {/* Song Modal */}
+        {selectedSong && (
+          <div style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            bottom: 0, 
+            backgroundColor: 'rgba(0,0,0,0.8)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+          onClick={() => setSelectedSong(null)}
+          >
             <div style={{ 
-              whiteSpace: 'pre-line',
-              lineHeight: '1.6',
-              fontSize: '1rem',
-              fontFamily: 'monospace',
-              backgroundColor: '#f8f9fa',
-              padding: '1.5rem',
-              borderRadius: '8px',
-              border: '1px solid #e9ecef'
-            }}>
-              {selectedSong.lyrics}
+              backgroundColor: 'white', 
+              padding: '2rem', 
+              borderRadius: '15px',
+              maxWidth: '600px',
+              width: '90%',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setSelectedSong(null)}
+                style={{ 
+                  position: 'absolute',
+                  top: '1rem',
+                  right: '1rem',
+                  background: 'none', 
+                  border: 'none', 
+                  fontSize: '1.5rem', 
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                ×
+              </button>
+              
+              <div style={{ 
+                backgroundColor: '#667eea', 
+                color: 'white', 
+                padding: '1rem', 
+                borderRadius: '10px',
+                marginBottom: '1.5rem',
+                textAlign: 'center'
+              }}>
+                <h2 style={{ margin: '0 0 0.5rem 0' }}>🍺 {selectedSong.title}</h2>
+                {selectedSong.melody && (
+                  <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.9 }}>
+                    Melodi: {selectedSong.melody}
+                  </p>
+                )}
+              </div>
+              
+              <div style={{ 
+                whiteSpace: 'pre-line',
+                lineHeight: '1.6',
+                fontSize: '1rem',
+                fontFamily: 'monospace',
+                backgroundColor: '#f8f9fa',
+                padding: '1.5rem',
+                borderRadius: '8px',
+                border: '1px solid #e9ecef'
+              }}>
+                {selectedSong.lyrics}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        <div className="card" style={{ 
+          marginTop: '2rem',
+          backgroundColor: '#28a745',
+          color: 'white',
+          textAlign: 'center',
+          padding: '2rem'
+        }}>
+          <h2 style={{ marginBottom: '1rem' }}>🎵 Skål!</h2>
+          <p style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
+            Använd dessa snapsvisor för att skapa stämning under Skåre 2025!
+          </p>
+          <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>
+            Kom ihåg att dricka ansvarsfullt och ha kul tillsammans!
+          </p>
+        </div>
+        
+        <div className="card" style={{ marginTop: '2rem' }}>
+          <h3>📝 Tips för snapsvisor</h3>
+          <div className="grid grid-2">
+            <div>
+              <h4>🎤 Sångteknik</h4>
+              <ul style={{ fontSize: '0.9rem', color: '#666' }}>
+                <li>Sjung med entusiasm och glädje</li>
+                <li>Inkludera alla i sången</li>
+                <li>Variera tempot och stämningen</li>
+                <li>Ha kul och var respektfull</li>
+              </ul>
+            </div>
+            <div>
+              <h4>🍺 Skåltraditioner</h4>
+              <ul style={{ fontSize: '0.9rem', color: '#666' }}>
+                <li>Se varandra i ögonen när ni skålar</li>
+                <li>Vänta på alla innan ni dricker</li>
+                <li>Skål för varje snapsvisa</li>
+                <li>Ha kul men drick ansvarsfullt</li>
+              </ul>
             </div>
           </div>
         </div>
-      )}
-      
-      <div className="card" style={{ 
-        marginTop: '2rem',
-        backgroundColor: '#28a745',
-        color: 'white',
-        textAlign: 'center',
-        padding: '2rem'
-      }}>
-        <h2 style={{ marginBottom: '1rem' }}>🎵 Skål!</h2>
-        <p style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
-          Använd dessa snapsvisor för att skapa stämning under Skåre 2025!
-        </p>
-        <p style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-          Kom ihåg att dricka ansvarsfullt och ha kul tillsammans!
-        </p>
       </div>
-      
-      <div className="card" style={{ marginTop: '2rem' }}>
-        <h3>📝 Tips för snapsvisor</h3>
-        <div className="grid grid-2">
-          <div>
-            <h4>🎤 Sångteknik</h4>
-            <ul style={{ fontSize: '0.9rem', color: '#666' }}>
-              <li>Sjung med entusiasm och glädje</li>
-              <li>Inkludera alla i sången</li>
-              <li>Variera tempot och stämningen</li>
-              <li>Ha kul och var respektfull</li>
-            </ul>
-          </div>
-          <div>
-            <h4>🍺 Skåltraditioner</h4>
-            <ul style={{ fontSize: '0.9rem', color: '#666' }}>
-              <li>Se varandra i ögonen när ni skålar</li>
-              <li>Vänta på alla innan ni dricker</li>
-              <li>Skål för varje snapsvisa</li>
-              <li>Ha kul men drick ansvarsfullt</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
+    </PasswordProtection>
   );
 };
 
