@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { buildApiUrl } from '../config';
 
 interface Photo {
@@ -39,19 +39,7 @@ const Bildarkiv: React.FC = () => {
 
   const years = [2022, 2023, 2024, 2025];
 
-  useEffect(() => {
-    fetchPhotos();
-    checkCurrentUser();
-  }, [selectedYear]);
-
-  const checkCurrentUser = () => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setCurrentUser(JSON.parse(userData));
-    }
-  };
-
-  const fetchPhotos = async () => {
+  const fetchPhotos = useCallback(async () => {
     try {
           const url = selectedYear === 'all'
       ? buildApiUrl('/api/photos')
@@ -67,7 +55,19 @@ const Bildarkiv: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  }, [selectedYear]);
+
+  const checkCurrentUser = () => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setCurrentUser(JSON.parse(userData));
+    }
   };
+
+  useEffect(() => {
+    fetchPhotos();
+    checkCurrentUser();
+  }, [selectedYear, fetchPhotos]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

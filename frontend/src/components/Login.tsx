@@ -91,7 +91,11 @@ const Login: React.FC<LoginProps> = ({ onPasswordVerified, onLogin, onClose, mod
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('Ett fel uppstod. Kontrollera att servern är igång.');
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        setError('Kan inte ansluta till servern. Kontrollera att backend-servern är igång på http://localhost:5001');
+      } else {
+        setError('Ett fel uppstod. Kontrollera att servern är igång.');
+      }
     } finally {
       setLoading(false);
     }
